@@ -86,11 +86,13 @@ def depthFirstSearch(problem):
 
     while not frontier.isEmpty():
         currentState, currentPath = frontier.pop()
-
-        # If this state has already been visited, skip it
+        # Add the current state to the explored set
         if currentState in explored:
             continue
-
+        explored.add(currentState)
+        # Check if the current state is the goal state
+        if problem.isGoalState(currentState):
+            return currentPath
         # Expand successors and push them to the stack
         for successor, action, stepCost in problem.getSuccessors(currentState):
             if successor not in explored:
