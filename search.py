@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 from util import*
+import time 
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -73,95 +74,94 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
+    """
+    Search the deepest nodes in the search tree first.
+    """
+    start_time = time.time()  # Start the timer
 
-    """Search the deepest nodes in the search tree first."""
-    startState = problem.getStartState()
-    if problem.isGoalState(startState):
-        return []  # If the start state is already the goal
+    startState = problem.getStartState()  # Get the start state of the problem
+    if problem.isGoalState(startState):  # Check if the start state is already the goal state
+        print("Execution time: {:.6f} seconds".format(time.time() - start_time))
+        return []
 
-    # Use a stack to manage frontier, storing tuples of (state, path)
-    frontier = util.Stack()
-    frontier.push((startState, []))  # Start state with an empty path
-    explored = set()  # To keep track of visited nodes
+    frontier = util.Stack()  # Initialize the frontier using a stack
+    frontier.push((startState, []))  # Push the start state and an empty path onto the stack
+    explored = set()  # Set to keep track of explored states
 
     while not frontier.isEmpty():
-        currentState, currentPath = frontier.pop()
-        # Add the current state to the explored set
-        if currentState in explored:
+        currentState, currentPath = frontier.pop()  # Pop a state and its path from the stack
+        if currentState in explored:  # Skip if the state has already been explored
             continue
-        explored.add(currentState)
-        # Check if the current state is the goal state
-        if problem.isGoalState(currentState):
+        explored.add(currentState)  # Mark the state as explored
+        if problem.isGoalState(currentState):  # Check if the current state is the goal state
+            print("Execution time: {:.6f} seconds".format(time.time() - start_time))
             return currentPath
-        # Expand successors and push them to the stack
-        for successor, action, stepCost in problem.getSuccessors(currentState):
+        for successor, action, stepCost in problem.getSuccessors(currentState):  # Explore successors
             if successor not in explored:
-                newPath = currentPath + [action]  # Add the action to the path
-                frontier.push((successor, newPath))
+                newPath = currentPath + [action]  # Create a new path including the current action
+                frontier.push((successor, newPath))  # Push the successor and its path onto the stack
 
-    # Return an empty list if no solution is found
+    print("Execution time: {:.6f} seconds".format(time.time() - start_time))
     return []
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    #util.raiseNotDefined()
-    """ Search the shallowest nodes in the search tree first. """
-    currPath = []           # The path that is popped from the frontier in each loop
-    currState =  problem.getStartState()    # The state(position) that is popped for the frontier in each loop
-    print(f"currState: {currState}")
-    if problem.isGoalState(currState):     # Checking if the start state is also a goal state
-        return currPath
+    """
+    Search the shallowest nodes in the search tree first.
+    """
+    start_time = time.time()  # Start the timer
 
-    frontier = Queue()
-    frontier.push( (currState, currPath) )     # Insert just the start state, in order to pop it first
-    explored = set()
+    currState = problem.getStartState()  # Get the start state of the problem
+    if problem.isGoalState(currState):  # Check if the start state is already the goal state
+        print("Execution time: {:.6f} seconds".format(time.time() - start_time))
+        return []
+
+    frontier = util.Queue()  # Initialize the frontier using a queue
+    frontier.push((currState, []))  # Push the start state and an empty path onto the queue
+    explored = set()  # Set to keep track of explored states
+
     while not frontier.isEmpty():
-        currState, currPath = frontier.pop()    # Popping a state and the corresponding path
-        # To pass autograder.py question2:
-        if problem.isGoalState(currState):
+        currState, currPath = frontier.pop()  # Pop a state and its path from the queue
+        if problem.isGoalState(currState):  # Check if the current state is the goal state
+            print("Execution time: {:.6f} seconds".format(time.time() - start_time))
             return currPath
-        explored.add(currState)
-        frontierStates = [ t[0] for t in frontier.list ]
-        for s in problem.getSuccessors(currState):
-            if s[0] not in explored and s[0] not in frontierStates:
-                # Lecture code:
-                # if problem.isGoalState(s[0]):
-                #     return currPath + [s[1]]
-                frontier.push( (s[0], currPath + [s[1]]) )      # Adding the successor and its path to the frontier
+        explored.add(currState)  # Mark the state as explored
+        frontierStates = [t[0] for t in frontier.list]  # Get all states currently in the frontier
+        for s in problem.getSuccessors(currState):  # Explore successors
+            if s[0] not in explored and s[0] not in frontierStates:  # Check if the successor is unexplored
+                frontier.push((s[0], currPath + [s[1]]))  # Push the successor and its path onto the queue
 
-    return []       # If this point is reached, a solution could not be found.
+    print("Execution time: {:.6f} seconds".format(time.time() - start_time))
+    return []
 
 def uniformCostSearch(problem):
-  
-    """Search the node of least total cost first."""
-    currPath = []  # The path that is popped from the frontier in each loop
-    currState = problem.getStartState()  # The state(position) that is popped from the frontier in each loop
-    currCost = 0  # Current cost to reach `currState`
+    """
+    Search the node of least total cost first.
+    """
+    start_time = time.time()  # Start the timer
 
-    if problem.isGoalState(currState):  # Checking if the start state is also a goal state
-        return currPath
+    currState = problem.getStartState()  # Get the start state of the problem
+    if problem.isGoalState(currState):  # Check if the start state is already the goal state
+        print("Execution time: {:.6f} seconds".format(time.time() - start_time))
+        return []
 
-    frontier = PriorityQueue()  # UCS uses a priority queue for the frontier
-    frontier.push((currState, currPath, currCost), currCost)  # Push the start state with priority = cost
-    explored = set()  # To keep track of explored nodes
+    frontier = util.PriorityQueue()  # Initialize the frontier using a priority queue
+    frontier.push((currState, [], 0), 0)  # Push the start state, empty path, and cost 0 onto the priority queue
+    explored = set()  # Set to keep track of explored states
 
     while not frontier.isEmpty():
-        currState, currPath, currCost = frontier.pop()  # Popping a state, the corresponding path, and cost
-        
-        if currState not in explored:
-            explored.add(currState)
-
-            if problem.isGoalState(currState):  # Check if the current state is a goal state
+        currState, currPath, currCost = frontier.pop()  # Pop a state, its path, and cost from the priority queue
+        if currState not in explored:  # Check if the state has already been explored
+            explored.add(currState)  # Mark the state as explored
+            if problem.isGoalState(currState):  # Check if the current state is the goal state
+                print("Execution time: {:.6f} seconds".format(time.time() - start_time))
                 return currPath
-
-            for successor, action, stepCost in problem.getSuccessors(currState):
+            for successor, action, stepCost in problem.getSuccessors(currState):  # Explore successors
                 if successor not in explored:
-                    newCost = currCost + stepCost  # Calculate the new cost to reach `successor`
-                    frontier.push((successor, currPath + [action], newCost), newCost)  # Push successor with updated cost
+                    newCost = currCost + stepCost  # Calculate the new cost to reach the successor
+                    frontier.push((successor, currPath + [action], newCost), newCost)  # Push the successor onto the priority queue
 
-    return []  # If this point is reached, no solution was found
-
+    print("Execution time: {:.6f} seconds".format(time.time() - start_time))
+    return []
 
 def nullHeuristic(state, problem=None):
     """
